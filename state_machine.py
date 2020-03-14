@@ -51,13 +51,13 @@ class Finite_State_Automata:
             for tup in self.state_transition_table:         # Go through each item of the table and unack into its components as separate vars
                 start, c, transition_to = tup
                 if current_state == start and char == c:    # Check if there is a match
-                    if transition_to == "NULL":             # if there is a match and the input is to a null state dont do anything (transition to itself)
-                        transitioned = True
-                        break
+                    if transition_to == "NULL":             # if there is a match and the input is to a null state, reject it
+                        return "REJECT"
                     else:
-                        current_state = transition_to       # Update our current state if there is a valid match
+                        current_state = transition_to       # Update our current state
                         transitioned = True                 # Mark transitioned as true
                         break                               # Break out of the loop
+
             if not transitioned:                            # If no state transition occurred then the input character was invalid so reject
                 return "REJECT"
 
@@ -73,7 +73,7 @@ class Finite_State_Automata:
         Recognizes whether the specificed input is described by our FSA
         Goes through each character in the string and checks the state transition table against it
 
-        This algorithm works on strings where the match may not be at the beginning of the string
+        This algorithm works on strings where the match may not be at the beginning of the string or there may be characters after the match
         
         params---
         input_string -> input string to check
@@ -96,13 +96,14 @@ class Finite_State_Automata:
             for tup in self.state_transition_table:         # Go through each item of the table and unack into its components as separate vars
                 start, c, transition_to = tup
                 if current_state == start and char == c:    # Check if there is a match
-                    if transition_to == "NULL":             # if there is a match and the input is to a null state dont do anything (transition to itself)
-                        transitioned = True
+                    if transition_to == "NULL":             # if there is a match and the input is to a NULL then RESET the state machine
+                        current_state = self.start_state
                         break
                     else:
                         current_state = transition_to       # Update our current state if there is a valid match
                         transitioned = True                 # Mark transitioned as true
                         break                               # Break out of the loop
+                    
             if (current_state in self.acceptor_states):     # If we go into an accept state immediately accept (greedy)
                 return "ACCEPT"
             if not transitioned:                            # If no state transition then RESET the state machine
