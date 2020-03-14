@@ -1,5 +1,6 @@
 import unittest
 import state_machine
+import load as load_func
 
 class TestFSA(unittest.TestCase):
 
@@ -8,6 +9,7 @@ class TestFSA(unittest.TestCase):
         Test the basic D_Recognize algorithm using the sheep languages discussed in class
         the regex is defined as /^baa+!$/
         """
+        print("Testing D_recognize")
         states = ["1", "2", "3", "4"]
         domain = ["b", "a", "!"]
         start_state = "1"
@@ -27,6 +29,7 @@ class TestFSA(unittest.TestCase):
         """
         Tests the second d_recognize function by defining a machine that searches for the sequence "gary" in any string
         """
+        print("Testing D_recognize_b")
         states = ["1", "2", "3", "4", "5"]
         domain = ["g", "a", "r", "y"]
         start_state = "1"
@@ -60,5 +63,30 @@ class TestFSA(unittest.TestCase):
         self.assertEqual("REJECT", FSA.D_Recognize_b("carlin"))
         self.assertEqual("ACCEPT", FSA.D_Recognize_b("asdf&*YR@#UgaryJFES(*FY"))
         self.assertEqual("REJECT", FSA.D_Recognize_b("Gary"))
+
+    def test_load_file(self):
+        """
+        Runs file loading functions using the default machine
+        """
+        print("Testing file loading")
+        directory = "alpha_email_recognizer"
+        state_list = load_func.loadStates(directory)
+        domain = load_func.loadDomain(directory)
+        start_state = load_func.loadInitialState(directory)
+        accept_states = load_func.loadAcceptStates(directory)
+        transition_table = load_func.load_transition_table(directory)
+        FSA = state_machine.Finite_State_Automata(state_list, domain, start_state, accept_states, transition_table)
+
+        self.assertEqual("ACCEPT", FSA.D_Recognize("foobar@gmail.com"))
+        self.assertEqual("REJECT", FSA.D_Recognize(" foobar@gmail.com"))
+        self.assertEqual("REJECT", FSA.D_Recognize("foobar@@gmail.com"))
+        self.assertEqual("ACCEPT", FSA.D_Recognize("foo.bar@gmail.co.uk"))
+        self.assertEqual("REJECT", FSA.D_Recognize("FOOBAR@GMAIL.COM"))
+        self.assertEqual("ACCEPT", FSA.D_Recognize("foo.....bar@gmail.com"))
+
+        self.assertEqual("ACCEPT", FSA.D_Recognize_b("The email is foobar@gmail.com"))
+        self.assertEqual("ACCEPT", FSA.D_Recognize_b("foobar@gmail.com is the email"))
+        self.assertEqual("ACCEPT", FSA.D_Recognize_b("Send me an email at foobar@gmail.com thanks"))
+        self.assertEqual("REJECT", FSA.D_Recognize_b("My email is foobar@@gmail.com"))
 
 unittest.main()
